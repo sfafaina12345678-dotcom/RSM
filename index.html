@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OPD Slip - RSM Hospital</title>
+    <title>OPD Slip Generator</title>
     <style>
         @page {
             size: A4;
@@ -17,8 +17,52 @@
         body {
             font-family: Arial, sans-serif;
             font-size: 11pt;
+            background: #f5f5f5;
         }
+        
+        /* Page 1 - Entry Form */
+        .entry-page {
+            width: 100%;
+            min-height: 100vh;
+            padding: 40px;
+            background: white;
+        }
+        .entry-page h2 {
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: inline-block;
+            width: 120px;
+            font-weight: bold;
+        }
+        .form-group input {
+            padding: 8px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .btn {
+            padding: 12px 30px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            margin-right: 10px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+
+        /* Page 2 - A4 Slip */
         .a4-page {
+            display: none;
             width: 210mm;
             height: 297mm;
             position: relative;
@@ -37,91 +81,120 @@
         .patient-details td {
             padding: 1.5mm 0;
             vertical-align: top;
+            font-size: 11pt;
         }
         .patient-details td:first-child {
             font-weight: bold;
             width: 25mm;
         }
+        .patient-details td:nth-child(3) {
+            font-weight: bold;
+            width: 15mm;
+        }
         .doctor-details {
             position: absolute;
             bottom: 30mm;
             left: 20mm;
+            font-size: 11pt;
         }
         .doctor-details p {
             margin-bottom: 1mm;
+            line-height: 1.3;
         }
-        /* Print karte time button hide ho jaye */
+
+        /* Print Rules */
         @media print {
-            .no-print {
-                display: none;
+            body {
+                background: white;
             }
-        }
-        .input-form {
-            padding: 20px;
-            background: #f0f0f0;
-        }
-        .input-form input {
-            margin: 5px;
-            padding: 5px;
-            width: 200px;
-        }
-        .input-form button {
-            padding: 10px 20px;
-            background: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
+            .entry-page {
+                display: none !important;
+            }
+            .a4-page {
+                display: block !important;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Form - Yaha Data Bharna -->
-    <div class="input-form no-print">
-        <h3>Patient Details Bharo:</h3>
-        <input type="text" id="uhid" placeholder="UHID - RSM 6001">
-        <input type="text" id="name" placeholder="Name - Mr mahesh">
-        <input type="text" id="address" placeholder="Address - Hathgam">
-        <input type="text" id="mobile" placeholder="Mobile - 9535384500">
-        <input type="text" id="time" placeholder="Time - 12:14:19">
-        <input type="text" id="opid" placeholder="OPID - OP202606300027">
-        <input type="text" id="age" placeholder="Age - 25-Year/Male">
-        <input type="text" id="date" placeholder="Date - 30/06/2026">
-        <input type="text" id="validupto" placeholder="Valid Upto - 04/07/2026">
-        <br>
-        <button onclick="generateSlip()">Generate Slip</button>
-        <button onclick="window.print()">Print Slip</button>
+    <!-- PAGE 1: ENTRY FORM -->
+    <div class="entry-page" id="entryPage">
+        <h2>OPD Slip - Patient Entry</h2>
+        <div class="form-group">
+            <label>UHID:</label>
+            <input type="text" id="uhid" value="RSM 6001">
+        </div>
+        <div class="form-group">
+            <label>Name:</label>
+            <input type="text" id="name" value="Mr mahesh">
+        </div>
+        <div class="form-group">
+            <label>Address:</label>
+            <input type="text" id="address" value="Hathgam">
+        </div>
+        <div class="form-group">
+            <label>Mobile:</label>
+            <input type="text" id="mobile" value="9535384500">
+        </div>
+        <div class="form-group">
+            <label>Time:</label>
+            <input type="text" id="time" value="12:14:19">
+        </div>
+        <div class="form-group">
+            <label>OPID:</label>
+            <input type="text" id="opid" value="OP202606300027">
+        </div>
+        <div class="form-group">
+            <label>Age:</label>
+            <input type="text" id="age" value="25-Year/Male">
+        </div>
+        <div class="form-group">
+            <label>Date:</label>
+            <input type="text" id="date" value="30/06/2026">
+        </div>
+        <div class="form-group">
+            <label>Valid Upto:</label>
+            <input type="text" id="validupto" value="04/07/2026">
+        </div>
+        <div class="form-group">
+            <label>Print Time:</label>
+            <input type="text" id="printtime" value="12:14:00">
+        </div>
+        
+        <button class="btn" onclick="showSlip()">Generate Slip</button>
+        <button class="btn" onclick="window.print()">Print Slip</button>
     </div>
 
-    <!-- A4 Slip - Ye Print Hoga -->
-    <div class="a4-page" id="printArea">
-        <!-- Patient Details - Top Right -->
+    <!-- PAGE 2: A4 SLIP - Ye Print Hoga -->
+    <div class="a4-page" id="printPage">
+        <!-- Patient Details - Top Right - Exact Photo Jaisa -->
         <div class="patient-details">
             <table>
                 <tr>
                     <td>UHID</td>
-                    <td>: <span id="out-uhid">RSM 6001</span></td>
-                    <td style="font-weight: bold; width: 15mm;">OPID</td>
-                    <td>: <span id="out-opid">OP202606300027</span></td>
+                    <td>: <span id="out-uhid"></span></td>
+                    <td>OPID</td>
+                    <td>: <span id="out-opid"></span></td>
                 </tr>
                 <tr>
                     <td>Name</td>
-                    <td>: <span id="out-name">Mr mahesh</span></td>
-                    <td style="font-weight: bold;">Age</td>
-                    <td>: <span id="out-age">25-Year/Male</span></td>
+                    <td>: <span id="out-name"></span></td>
+                    <td>Age</td>
+                    <td>: <span id="out-age"></span></td>
                 </tr>
                 <tr>
                     <td>Address</td>
-                    <td colspan="3">: <span id="out-address">Hathgam</span></td>
+                    <td colspan="3">: <span id="out-address"></span></td>
                 </tr>
                 <tr>
                     <td>Mobile</td>
-                    <td>: <span id="out-mobile">9535384500</span></td>
-                    <td style="font-weight: bold;">Date</td>
-                    <td>: <span id="out-date">30/06/2026</span></td>
+                    <td>: <span id="out-mobile"></span></td>
+                    <td>Date</td>
+                    <td>: <span id="out-date"></span></td>
                 </tr>
                 <tr>
                     <td>Time</td>
-                    <td colspan="3">: <span id="out-time">12:14:19</span></td>
+                    <td colspan="3">: <span id="out-time"></span></td>
                 </tr>
             </table>
         </div>
@@ -131,27 +204,29 @@
             <p><b>DR. ASHOK PATEL</b></p>
             <p>MBBS,</p>
             <p>PHYSICIAN</p>
-            <p>Valid Upto : <span id="out-validupto">04/07/2026</span></p>
-            <p id="out-time2">12:14:00</p>
+            <p>Valid Upto : <span id="out-validupto"></span></p>
+            <p id="out-printtime"></p>
         </div>
     </div>
 
     <script>
-        function generateSlip() {
-            document.getElementById('out-uhid').innerText = document.getElementById('uhid').value || 'RSM 6001';
-            document.getElementById('out-name').innerText = document.getElementById('name').value || 'Mr mahesh';
-            document.getElementById('out-address').innerText = document.getElementById('address').value || 'Hathgam';
-            document.getElementById('out-mobile').innerText = document.getElementById('mobile').value || '9535384500';
-            document.getElementById('out-time').innerText = document.getElementById('time').value || '12:14:19';
-            document.getElementById('out-opid').innerText = document.getElementById('opid').value || 'OP202606300027';
-            document.getElementById('out-age').innerText = document.getElementById('age').value || '25-Year/Male';
-            document.getElementById('out-date').innerText = document.getElementById('date').value || '30/06/2026';
-            document.getElementById('out-validupto').innerText = document.getElementById('validupto').value || '04/07/2026';
-            document.getElementById('out-time2').innerText = document.getElementById('time').value || '12:14:00';
+        function showSlip() {
+            // Data utha ke slip me daal de
+            document.getElementById('out-uhid').innerText = document.getElementById('uhid').value;
+            document.getElementById('out-name').innerText = document.getElementById('name').value;
+            document.getElementById('out-address').innerText = document.getElementById('address').value;
+            document.getElementById('out-mobile').innerText = document.getElementById('mobile').value;
+            document.getElementById('out-time').innerText = document.getElementById('time').value;
+            document.getElementById('out-opid').innerText = document.getElementById('opid').value;
+            document.getElementById('out-age').innerText = document.getElementById('age').value;
+            document.getElementById('out-date').innerText = document.getElementById('date').value;
+            document.getElementById('out-validupto').innerText = document.getElementById('validupto').value;
+            document.getElementById('out-printtime').innerText = document.getElementById('printtime').value;
+            
+            // Page 1 hide, Page 2 show kar de
+            document.getElementById('entryPage').style.display = 'none';
+            document.getElementById('printPage').style.display = 'block';
         }
-        
-        // Page load pe default value set kar de
-        window.onload = generateSlip;
     </script>
 </body>
 </html>
