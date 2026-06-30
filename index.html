@@ -94,7 +94,8 @@
         .doctor-details {
             position: absolute;
             bottom: 30mm;
-            left: 20mm;
+            right: 20mm;
+            text-align: right;
             font-size: 11pt;
         }
         .doctor-details p {
@@ -165,9 +166,9 @@
         <button class="btn" onclick="window.print()">Print Slip</button>
     </div>
 
-    <!-- PAGE 2: A4 SLIP - Ye Print Hoga -->
+    <!-- PAGE 2: A4 SLIP -->
     <div class="a4-page" id="printPage">
-        <!-- Patient Details - Top Right - Exact Photo Jaisa -->
+        <!-- Patient Details - Top Right -->
         <div class="patient-details">
             <table>
                 <tr>
@@ -199,7 +200,7 @@
             </table>
         </div>
 
-        <!-- Doctor Details - Bottom Left - Fixed -->
+        <!-- Doctor Details - Bottom Right - Ab Right Me -->
         <div class="doctor-details">
             <p><b>DR. ASHOK PATEL</b></p>
             <p>MBBS,</p>
@@ -211,7 +212,6 @@
 
     <script>
         function showSlip() {
-            // Data utha ke slip me daal de
             document.getElementById('out-uhid').innerText = document.getElementById('uhid').value;
             document.getElementById('out-name').innerText = document.getElementById('name').value;
             document.getElementById('out-address').innerText = document.getElementById('address').value;
@@ -223,7 +223,6 @@
             document.getElementById('out-validupto').innerText = document.getElementById('validupto').value;
             document.getElementById('out-printtime').innerText = document.getElementById('printtime').value;
             
-            // Page 1 hide, Page 2 show kar de
             document.getElementById('entryPage').style.display = 'none';
             document.getElementById('printPage').style.display = 'block';
         }
